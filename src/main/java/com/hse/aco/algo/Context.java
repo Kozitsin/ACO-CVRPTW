@@ -11,10 +11,13 @@ import java.util.stream.Collectors;
 import static java.lang.Math.*;
 import static java.lang.Math.pow;
 
+@SuppressWarnings("WeakerAccess")
 public class Context {
     public Map<Integer, Customer> customers = new HashMap<>();
     public double[][] distance;
     public double[][] savings;
+    public double[][] inverse;
+    public double[][] pheromones;
 
     public final int MAX_TRUCK_CAPACITY;
     public final int MAX_TRUCK_NUMBER;
@@ -27,10 +30,21 @@ public class Context {
         MAX_TRUCK_NUMBER = maxTruckNumber;
         calculateDistances(customers);
         calculateSavings();
+        initializePheromones();
     }
 
     public Customer getDepot() {
         return customers.get(0);
+    }
+
+    public double calculateCost(int last, int next) {
+        return Math.pow(pheromones[last][next], MetaParams.alpha) +
+                Math.pow(inverse[last][next], MetaParams.beta) +
+                Math.pow(savings[last][next], MetaParams.lambda);
+    }
+
+    public void updatePheromones(int last, int next) {
+        pheromones[last][next] = (1 - MetaParams.p) * pheromones[last][next] + MetaParams.p * MetaParams.theta0;
     }
 
     private static double dist(double x1, double x2, double y1, double y2) {
@@ -39,14 +53,17 @@ public class Context {
 
     private void calculateDistances(List<Customer> customers) {
         distance = new double[customers.size()][customers.size()];
+        inverse = new double[customers.size()][customers.size()];
         for (int i = 0; i < customers.size(); i++) {
             Customer c1 = customers.get(i);
             for (int j = i; j < customers.size(); j++) {
                 if (i == j) {
                     distance[i][j] = 0.0;
+                    inverse[i][j] = Double.MAX_VALUE;
                 } else {
                     Customer c2 = customers.get(j);
                     distance[i][j] = distance[j][i] = dist(c1.x, c2.x, c1.y, c2.y);
+                    inverse[i][j] =  inverse[j][i] = 1 / distance[i][j];
                 }
             }
         }
@@ -63,5 +80,12 @@ public class Context {
                 savings[i][j] = saving(distance[i][0], distance[0][j], distance[i][j]);
             }
         }
+    }
+
+    private void initializePheromones() {
+        pheromones = new double[customers.size()][customers.size()];
+        for (int i = 0; i < pheromones.length; i++)
+            for (int j = 0; j < pheromones.length; j++)
+                pheromones[i][j] = MetaParams.theta0;
     }
 }

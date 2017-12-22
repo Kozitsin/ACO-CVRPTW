@@ -1,17 +1,16 @@
 package com.hse.aco.entity;
 
-@SuppressWarnings("WeakerAccess")
 public class Customer {
     public int customerId;
     public double x;
     public double y;
-    public double demand;
+    public int demand;
 
     public double readyTime;
     public double dueDate;
     public double serviceTime;
 
-    public Customer(int customerId, double x, double y, double demand, double readyTime, double dueDate, double serviceTime) {
+    public Customer(int customerId, double x, double y, int demand, double readyTime, double dueDate, double serviceTime) {
         this.customerId = customerId;
         this.x = x;
         this.y = y;

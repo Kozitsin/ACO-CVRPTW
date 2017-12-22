@@ -4,8 +4,10 @@ import com.hse.aco.entity.Customer;
 import com.hse.aco.entity.Truck;
 
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
+@SuppressWarnings("WeakerAccess")
 public class Utils {
     public static Predicate<Map.Entry<Integer, Customer>> NOT_VISITED(final Truck t) {
         return e -> !t.visited.contains(e.getKey());
@@ -22,5 +24,9 @@ public class Utils {
 
     public static Predicate<Map.Entry<Integer, Customer>> TIME_CONSTRAINT(final Truck t, final Context context) {
         return e -> t.currentTime + context.distance[t.lastVisited()][e.getKey()] < e.getValue().dueDate;
+    }
+
+    public static Function<Customer, Double> NEXT_CUSTOMER_RULE(final int i, final Context context) {
+        return c -> context.calculateCost(i, c.customerId);
     }
 }
