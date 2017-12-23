@@ -1,5 +1,6 @@
 package com.hse.aco.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,7 +8,7 @@ public class Truck {
     public int usedCapacity;
     public double distanceTravelled;
     public double currentTime = 0.0;
-    public List<Integer> visited;
+    public List<Integer> visited = new ArrayList<>();
 
 
     public Truck(int usedCapacity, double distanceTravelled, Customer customer) {

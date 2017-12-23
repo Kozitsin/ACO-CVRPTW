@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
-import static java.lang.Math.pow;
 
 @SuppressWarnings("WeakerAccess")
 public class Context {
@@ -22,7 +21,9 @@ public class Context {
     public final int MAX_TRUCK_CAPACITY;
     public final int MAX_TRUCK_NUMBER;
 
-    Solution best = new Solution();
+    public double T = MetaParams.T0;
+
+    public Solution best = new Solution(Double.MAX_VALUE);
 
     public Context(List<Customer> customers, int maxTruckCapacity, int maxTruckNumber) {
         this.customers = customers.stream().collect(Collectors.toMap(c -> c.customerId, c -> c ));
@@ -38,13 +39,17 @@ public class Context {
     }
 
     public double calculateCost(int last, int next) {
-        return Math.pow(pheromones[last][next], MetaParams.alpha) +
-                Math.pow(inverse[last][next], MetaParams.beta) +
-                Math.pow(savings[last][next], MetaParams.lambda);
+        return pow(pheromones[last][next], MetaParams.alpha) +
+                pow(inverse[last][next], MetaParams.beta) +
+                pow(savings[last][next], MetaParams.lambda);
     }
 
     public void updatePheromones(int last, int next) {
-        pheromones[last][next] = (1 - MetaParams.p) * pheromones[last][next] + MetaParams.p * MetaParams.theta0;
+        updatePheromones(last, next, MetaParams.tau0);
+    }
+
+    public void updatePheromones(int last, int next, double delta) {
+        pheromones[last][next] = (1 - MetaParams.p) * pheromones[last][next] + MetaParams.p * delta;
     }
 
     private static double dist(double x1, double x2, double y1, double y2) {
@@ -70,7 +75,7 @@ public class Context {
     }
 
     private static double saving(double di0, double d0j, double dij) {
-        return di0 + d0j - MetaParams.g * dij + MetaParams.f * Math.abs(di0 - d0j);
+        return di0 + d0j - MetaParams.g * dij + MetaParams.f * abs(di0 - d0j);
     }
 
     private void calculateSavings() {
@@ -86,6 +91,6 @@ public class Context {
         pheromones = new double[customers.size()][customers.size()];
         for (int i = 0; i < pheromones.length; i++)
             for (int j = 0; j < pheromones.length; j++)
-                pheromones[i][j] = MetaParams.theta0;
+                pheromones[i][j] = MetaParams.tau0;
     }
 }

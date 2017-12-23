@@ -4,13 +4,14 @@ import com.hse.aco.entity.Customer;
 import com.hse.aco.entity.Truck;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 @SuppressWarnings("WeakerAccess")
 public class Utils {
-    public static Predicate<Map.Entry<Integer, Customer>> NOT_VISITED(final Truck t) {
-        return e -> !t.visited.contains(e.getKey());
+    public static Predicate<Map.Entry<Integer, Customer>> NOT_VISITED(final Set<Integer> used) {
+        return e -> !used.contains(e.getKey());
     }
 
     public static Predicate<Map.Entry<Integer, Customer>> WEIGHT_CONSTRAINT(final Truck t, final Context context) {

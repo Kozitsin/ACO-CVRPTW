@@ -6,54 +6,64 @@ import com.hse.aco.entity.Customer;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.net.URLDecoder.decode;
 
 public class Reader {
+
+    private static void skip(BufferedReader reader, int n) throws IOException {
+        for (int i = 0; i < n; i++) {
+            reader.readLine();
+        }
+    }
+
     public static Context read(String fileName) {
         Context context;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(new File(decode(fileName, "UTF-8"))))) {
-            String[] size = reader.readLine().split(" ");
+            List<String> line;
 
             int cust_id;
-            int XCOORD;
-            int YCOORD;
-            int DEMAND;
-            int RTIME;
-            int DDATE;
-            int STIME;
+            double x;
+            double y;
+            int demand;
+            double readyTime;
+            double dueDate;
+            double serviceTime;
 
-            for (int i = 0; i < 4; i++) {
-                reader.readLine();
+            skip(reader, 4);
+            line = Stream.of(reader.readLine().trim().split(" "))
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+
+            int maxTruckNumber = Integer.valueOf(line.get(0));
+            int maxTruckCapacity = Integer.valueOf(line.get(1));
+
+            skip(reader, 4);
+
+            List<Customer> customers = new ArrayList<>();
+
+            String current;
+            while((current = reader.readLine()) != null) {
+                line = Stream.of(current.trim().split(" "))
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
+
+                cust_id = Integer.valueOf(line.get(0));
+                x = Double.valueOf(line.get(1));
+                y = Double.valueOf(line.get(2));
+                demand = Integer.valueOf(line.get(3));
+                readyTime = Double.valueOf(line.get(4));
+                dueDate = Double.valueOf(line.get(5));
+                serviceTime = Double.valueOf(line.get(6));
+                customers.add(new Customer(cust_id, x, y, demand, readyTime, dueDate, serviceTime));
             }
-            int maxTruckNumber = Integer.valueOf(size[0]);
-            int maxTruckCapacity = Integer.valueOf(size[1]);
 
-            for (int i = 0; i < 4; i++) {
-                reader.readLine();
-            }
-
-            List<Context> contexts = new ArrayList<>();
-
-            while((reader.readLine() ) != null ) {
-                cust_id = Integer.valueOf(size[0]);
-                XCOORD = Integer.valueOf(size[1]);
-                YCOORD = Integer.valueOf(size[2]);
-                DEMAND = Integer.valueOf(size[3]);
-                RTIME = Integer.valueOf(size[4]);
-                DDATE = Integer.valueOf(size[5]);
-                STIME = Integer.valueOf(size[6]);
-
-                contexts.add(cust_id);
-
-            }
-
-            context = new Context(context, maxTruckCapacity, maxTruckNumber);
-
-        }
-        catch (IOException ex) {
-                return null;
+            context = new Context(customers, maxTruckCapacity, maxTruckNumber);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
         return context;
     }
