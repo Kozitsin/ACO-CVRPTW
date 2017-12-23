@@ -14,27 +14,17 @@ import static java.net.URLDecoder.decode;
 public class Reader {
 
     private static void skip(BufferedReader reader, int n) throws IOException {
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++)
             reader.readLine();
-        }
     }
 
     public static Context read(String fileName) {
         Context context;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(new File(decode(fileName, "UTF-8"))))) {
-            List<String> line;
-
-            int cust_id;
-            double x;
-            double y;
-            int demand;
-            double readyTime;
-            double dueDate;
-            double serviceTime;
-
-            skip(reader, 4);
-            line = Stream.of(reader.readLine().trim().split(" "))
+            String instanceName = reader.readLine();
+            skip(reader, 3);
+            List<String> line = Stream.of(reader.readLine().trim().split(" "))
                     .filter(s -> !s.isEmpty())
                     .collect(Collectors.toList());
 
@@ -51,19 +41,18 @@ public class Reader {
                         .filter(s -> !s.isEmpty())
                         .collect(Collectors.toList());
 
-                cust_id = Integer.valueOf(line.get(0));
-                x = Double.valueOf(line.get(1));
-                y = Double.valueOf(line.get(2));
-                demand = Integer.valueOf(line.get(3));
-                readyTime = Double.valueOf(line.get(4));
-                dueDate = Double.valueOf(line.get(5));
-                serviceTime = Double.valueOf(line.get(6));
-                customers.add(new Customer(cust_id, x, y, demand, readyTime, dueDate, serviceTime));
+                int customerId = Integer.valueOf(line.get(0));
+                double x = Double.valueOf(line.get(1));
+                double y = Double.valueOf(line.get(2));
+                int demand = Integer.valueOf(line.get(3));
+                double readyTime = Double.valueOf(line.get(4));
+                double dueDate = Double.valueOf(line.get(5));
+                double serviceTime = Double.valueOf(line.get(6));
+                customers.add(new Customer(customerId, x, y, demand, readyTime, dueDate, serviceTime));
             }
-
-            context = new Context(customers, maxTruckCapacity, maxTruckNumber);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            context = new Context(instanceName, customers, maxTruckCapacity, maxTruckNumber);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return context;
     }

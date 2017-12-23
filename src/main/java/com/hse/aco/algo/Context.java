@@ -12,6 +12,8 @@ import static java.lang.Math.*;
 
 @SuppressWarnings("WeakerAccess")
 public class Context {
+    public String instanceName;
+
     public Map<Integer, Customer> customers = new HashMap<>();
     public double[][] distance;
     public double[][] savings;
@@ -25,7 +27,8 @@ public class Context {
 
     public Solution best = new Solution(Double.MAX_VALUE);
 
-    public Context(List<Customer> customers, int maxTruckCapacity, int maxTruckNumber) {
+    public Context(String instanceName, List<Customer> customers, int maxTruckCapacity, int maxTruckNumber) {
+        this.instanceName = instanceName;
         this.customers = customers.stream().collect(Collectors.toMap(c -> c.customerId, c -> c ));
         MAX_TRUCK_CAPACITY = maxTruckCapacity;
         MAX_TRUCK_NUMBER = maxTruckNumber;
