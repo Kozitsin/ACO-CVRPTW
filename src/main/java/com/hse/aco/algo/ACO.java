@@ -21,17 +21,28 @@ public class ACO {
 
     public Solution run() {
         for (int i = 0, iteration = 0; i < MetaParams.MAX_ITER_WO_IMPROVEMENT; i++, iteration++) {
-            if (iteration % 100 == 0) {
+            if (iteration % 10000 == 0) {
                 logger.info("Iteration {} started...", iteration);
             }
             Solution s = new Solution();
             Set<Integer> used = new HashSet<>();
             used.add(context.getDepot().customerId);
 
-            while (s.routes.size() < context.MAX_TRUCK_NUMBER && used.size() != context.customers.size()) {
+            while (s.routes.size() <= context.MAX_TRUCK_NUMBER && used.size() != context.customers.size()) {
                 Route r = buildSingleRoute(used);
                 s.routes.add(r);
                 s.total += r.cost;
+            }
+
+            // should skip invalid solution
+            if (s.routes.size() > context.MAX_TRUCK_NUMBER) {
+                logger.info("Invalid solution has been built. Trucks used: {}. Max is {}", s.routes.size(), context.MAX_TRUCK_NUMBER);
+                i--;
+                continue;
+            } else if (used.size() != context.customers.size()) {
+                logger.info("Invalid solution has been built. Served customers: {}. Total is {}", used.size(), context.customers.size());
+                i--;
+                continue;
             }
 
             updatePheromonesGlobal(s);
@@ -134,9 +145,11 @@ public class ACO {
     private void updatePheromonesGlobal(Solution s) {
         if (isGlobalUpdateAllowed(s)) {
             double delta = 1 / s.total;
-            for (int i = 0; i < context.pheromones.length; i++) {
-                for (int j = 0; j < context.pheromones.length; j++) {
-                    context.updatePheromones(i, j, delta);
+            for (Route r : s.routes) {
+                for (int i = 1; i < r.customers.size(); i++) {
+                    int last = context.customers.get(r.customers.get(i - 1)).customerId;
+                    int current = context.customers.get(r.customers.get(i)).customerId;
+                    context.updatePheromones(last, current, delta);
                 }
             }
         }

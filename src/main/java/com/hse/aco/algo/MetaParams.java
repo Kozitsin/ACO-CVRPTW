@@ -13,7 +13,7 @@ public class MetaParams {
     public static final double tau0 = 10e-6;
 
     public static final double T0 = 100;
-    public static final double theta = 0.9;
+    public static final double theta = 0.999;
 
-    public static final int MAX_ITER_WO_IMPROVEMENT = 20000;
+    public static final int MAX_ITER_WO_IMPROVEMENT = 1000000;
 }
