@@ -37,11 +37,11 @@ public class ACO {
             // should skip invalid solution
             if (s.routes.size() > context.MAX_TRUCK_NUMBER) {
                 logger.info("Invalid solution has been built. Trucks used: {}. Max is {}", s.routes.size(), context.MAX_TRUCK_NUMBER);
-                i--;
+                //i--;
                 continue;
             } else if (used.size() != context.customers.size()) {
                 logger.info("Invalid solution has been built. Served customers: {}. Total is {}", used.size(), context.customers.size());
-                i--;
+                //i--;
                 continue;
             }
 
